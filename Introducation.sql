@@ -1,86 +1,225 @@
--- The Ultimate MySQL Bootcamp: Go from SQL Beginner to Expert
+-- THE ULTIMATE MYSQL BOOTCAMP: GO FROM SQL BEGINNER TO EXPERT
 
--- CODE: Your First 5 Minutes of SQL
--- Your First 5 Minute of SQL CODE
--- Resources:
+-- CODE: YOUR FIRST 5 MINUTES OF SQL
+-- YOUR FIRST 5 MINUTE OF SQL CODE
+-- RESOURCES:
 
--- SQL Try-It Editor
+-- SQL TRY-IT EDITOR
 
--- Lecture Slides
+-- LECTURE SLIDES
 
--- Step 1.
+-- STEP 1.
 
-SELECT * FROM customers; 
+SELECT * FROM CUSTOMERS; 
 
--- Step 2.
+-- STEP 2.
 
-SELECT * FROM orders; 
+SELECT * FROM ORDERS; 
 
--- Step 3.
+-- STEP 3.
 
 SELECT * 
-FROM products
-ORDER BY Price DESC;
+FROM PRODUCTS
+ORDER BY PRICE DESC;
 
--- Step 4.
+-- STEP 4.
 
 SELECT 
- customerName,
- COUNT(*) AS 'number of orders'
-FROM customers
-INNER JOIN orders
- ON orders.customerID = customers.customerID
-GROUP BY customers.customerID;
+ CUSTOMERNAME,
+ COUNT(*) AS 'NUMBER OF ORDERS'
+FROM CUSTOMERS
+INNER JOIN ORDERS
+ ON ORDERS.CUSTOMERID = CUSTOMERS.CUSTOMERID
+GROUP BY CUSTOMERS.CUSTOMERID;
 
--- Note: Step 4 may give you errors if you're using firefox or any other browser other than Chrome, Safari, or Opera. This is because the SQL Try-It Editor is using WebSQL. See here for further discussion of errors that could occur when using firefox. You can use the query below in place of step 4, if you're using firefox:
+-- NOTE: STEP 4 MAY GIVE YOU ERRORS IF YOU'RE USING FIREFOX OR ANY OTHER BROWSER OTHER THAN CHROME, SAFARI, OR OPERA. THIS IS BECAUSE THE SQL TRY-IT EDITOR IS USING WEBSQL. SEE HERE FOR FURTHER DISCUSSION OF ERRORS THAT COULD OCCUR WHEN USING FIREFOX. YOU CAN USE THE QUERY BELOW IN PLACE OF STEP 4, IF YOU'RE USING FIREFOX:
 
 SELECT
-    customerName,
-    COUNT(*) AS 'number of orders'
-FROM customers
-INNER JOIN orders
-ON orders.customerID = customers.customerID
-GROUP BY customerName;
+    CUSTOMERNAME,
+    COUNT(*) AS 'NUMBER OF ORDERS'
+FROM CUSTOMERS
+INNER JOIN ORDERS
+ON ORDERS.CUSTOMERID = CUSTOMERS.CUSTOMERID
+GROUP BY CUSTOMERNAME;
 
--- ================== Databases ================== --
+-- ================== DATABASES ================== --
 
 -- LIST ALL DATABSES
 SHOW DATABASES; 
 
 -- CREATE NEW DATABASES
-CREATE DATABASE <name>;
-CREATE DATABASE hello_world;
+CREATE DATABASE <NAME>;
+CREATE DATABASE HELLO_WORLD;
 
 -- DELETE DATABASE
-DROP DATABASE <name>
+DROP DATABASE <NAME>
 
 -- USING DATABASES
-USE <database name>
+USE <DATABASE NAME>
 
 -- CURRENTLY SELECTED DATABASE
-SELECT database() 
+SELECT DATABASE() 
 
 
 -- ================== TABLESS ================== --
 
 SHOW TABLES;
 
-SHOW COLUMNS FROM <name>;
-DESC <name>;
+SHOW COLUMNS FROM <NAME>;
+DESC <NAME>;
 
-CREATE TABLE <name> 
+CREATE TABLE <NAME> 
 (
-    <column_name> <data_type>,
-    <column_name> <data_type>,
+    <COLUMN_NAME> <DATA_TYPE>,
+    <COLUMN_NAME> <DATA_TYPE>,
 )
 
-CREATE TABLE cat 
+CREATE TABLE CAT 
 (
-  name VARCHAR(100),
-  age INT
+  NAME VARCHAR(100),
+  AGE INT
 )
 
-DROP TABLE <tablename>; 
-DROP TABLE cats; 
+DROP TABLE <TABLENAME>; 
+DROP TABLE CATS; 
+
+-- ================== INSERT ================== --
+INSERT INTO <TABLE NAME> (COLUMN1, COLUMN2)
+VALUES ('COLUMN1VALUE', 'COLUMN2VALUE')
+
+INSERT INTO CATS (NAME, AGE)
+VALUES ('BOB', 7);
+
+-- MULTIPLE INSERT
+INSERT INTO TABLE_NAME 
+            (COLUMN_NAME, COLUMN_NAME) 
+VALUES      (VALUE, VALUE), 
+            (VALUE, VALUE), 
+            (VALUE, VALUE);
 
 
+-- CHECK WARNINGS
+SHOW WARNINGS;
+
+--  CODE: Setting Default Values
+
+-- Define a table with a DEFAULT name specified:
+
+CREATE TABLE cats3
+  (
+    name VARCHAR(20) DEFAULT 'no name provided',
+    age INT DEFAULT 99
+  );
+-- Notice the change when you describe the table:
+
+DESC cats3; 
+
+-- Insert a cat without a name:
+
+INSERT INTO cats3(age) VALUES(13); 
+
+-- Or a nameless, ageless cat:
+
+INSERT INTO cats3() VALUES(); 
+
+-- Combine NOT NULL and DEFAULT:
+
+CREATE TABLE cats4
+  (
+    name VARCHAR(20) NOT NULL DEFAULT 'unnamed',
+    age INT NOT NULL DEFAULT 99
+  );
+  
+-- Notice The Difference:
+
+INSERT INTO cats() VALUES();
+ 
+SELECT * FROM cats;
+ 
+INSERT INTO cats3() VALUES();
+ 
+SELECT * FROM cats3;
+ 
+INSERT INTO cats3(name, age) VALUES('Montana', NULL);
+ 
+SELECT * FROM cats3;
+ 
+INSERT INTO cats4(name, age) VALUES('Cali', NULL);
+
+
+
+-- CODE: A Primer on Primary Keys
+-- Define a table with a PRIMARY KEY constraint:
+
+CREATE TABLE unique_cats
+  (
+    cat_id INT NOT NULL,
+    name VARCHAR(100),
+    age INT,
+    PRIMARY KEY (cat_id)
+  );
+
+DESC unique_cats; 
+
+-- Insert some new cats:
+
+INSERT INTO unique_cats(cat_id, name, age) VALUES(1, 'Fred', 23);
+ 
+INSERT INTO unique_cats(cat_id, name, age) VALUES(2, 'Louise', 3);
+ 
+INSERT INTO unique_cats(cat_id, name, age) VALUES(1, 'James', 3);
+-- Notice what happens:
+
+SELECT * FROM unique_cats; 
+
+-- Adding in AUTO_INCREMENT:
+
+CREATE TABLE unique_cats2 (
+    cat_id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(100),
+    age INT,
+    PRIMARY KEY (cat_id)
+);
+-- INSERT a couple new cats:
+
+INSERT INTO unique_cats2(name, age) VALUES('Skippy', 4);
+INSERT INTO unique_cats2(name, age) VALUES('Jiff', 3);
+INSERT INTO unique_cats2(name, age) VALUES('Jiff', 3);
+INSERT INTO unique_cats2(name, age) VALUES('Jiff', 3);
+INSERT INTO unique_cats2(name, age) VALUES('Skippy', 4);
+-- Notice the difference:
+
+SELECT * FROM unique_cats2; 
+
+
+
+
+-- Table Constraints Exercise Solution
+Defining The employees table:
+
+CREATE TABLE employees (
+    id INT AUTO_INCREMENT NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    middle_name VARCHAR(255),
+    age INT NOT NULL,
+    current_status VARCHAR(255) NOT NULL DEFAULT 'employed',
+    PRIMARY KEY(id)
+);
+Another way of defining a primary key:
+
+
+
+CREATE TABLE employees (
+    id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    middle_name VARCHAR(255),
+    age INT NOT NULL,
+    current_status VARCHAR(255) NOT NULL DEFAULT 'employed'
+);
+A test INSERT:
+
+INSERT INTO employees(first_name, last_name, age) VALUES
+('Dora', 'Smith', 58);
+Fullscreen
