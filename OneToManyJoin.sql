@@ -2,14 +2,14 @@
 -- KEYS
 --*************************************************f
 
--- Creating the customers and orders tables
-
+-- CREATING THE CUSTOMERS AND ORDERS TABLES
 CREATE TABLE customers(
     id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(100),
     last_name VARCHAR(100),
     email VARCHAR(100)
 );
+
 CREATE TABLE orders(
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_date DATE,
@@ -17,8 +17,8 @@ CREATE TABLE orders(
     customer_id INT,
     FOREIGN KEY(customer_id) REFERENCES customers(id)
 );
--- Inserting some customers and orders
 
+-- INSERTING SOME CUSTOMERS AND ORDERS
 INSERT INTO customers (first_name, last_name, email) 
 VALUES ('Boy', 'George', 'george@gmail.com'),
        ('George', 'Michael', 'gm@gmail.com'),
@@ -33,8 +33,7 @@ VALUES ('2016/02/10', 99.99, 1),
        ('2015/01/03', 12.50, 2),
        ('1999/04/11', 450.25, 5);
        
--- This INSERT fails because of our fk constraint.  No user with id: 98
-
+-- THIS INSERT FAILS BECAUSE OF OUR FK CONSTRAINT.  NO USER WITH ID: 98
 INSERT INTO orders (order_date, amount, customer_id)
 VALUES ('2016/06/06', 33.67, 98);
 
@@ -45,65 +44,65 @@ VALUES ('2016/06/06', 33.67, 98);
 
 -- Finding Orders Placed By George: 2 Step Process
 
-SELECT id FROM customers WHERE last_name='George';
+SELECT id FROM customers WHERE last_name='George'; 
 SELECT * FROM orders WHERE customer_id = 1;
+
 -- Finding Orders Placed By George: Using a subquery
+SELECT * FROM orders WHERE customer_id = (
+    SELECT id FROM customers
+    WHERE last_name='George'
+);
 
-SELECT * FROM orders WHERE customer_id =
-    (
-        SELECT id FROM customers
-        WHERE last_name='George'
-    );
 -- Cross Join Craziness
-
 SELECT * FROM customers, orders;
 
 
 --*************************************************
--- INNER JOIN
+-- INNER JOIN: COMMON IN BOTH
 --*************************************************
 
 -- IMPLICIT INNER JOIN
 
 SELECT * FROM customers, orders 
 WHERE customers.id = orders.customer_id;
--- IMPLICIT INNER JOIN
 
+-- IMPLICIT INNER JOIN
 SELECT first_name, last_name, order_date, amount
 FROM customers, orders 
     WHERE customers.id = orders.customer_id;
     
 -- EXPLICIT INNER JOINS
-
 SELECT * FROM customers
 JOIN orders
     ON customers.id = orders.customer_id;
-    
+
+-- WE CAN SPECIFY SEPCIFIC COLUMNS FROM BOTH THE TABLES NOW
 SELECT first_name, last_name, order_date, amount 
 FROM customers
 JOIN orders
     ON customers.id = orders.customer_id;
     
-SELECT *
-FROM orders
+-- IN INNER JOIN ORDER OF TABLES DOESN'T MATTER
+SELECT * FROM orders
 JOIN customers
     ON customers.id = orders.customer_id;
--- ARBITRARY JOIN - meaningless, but still possible 
 
+-- ARBITRARY JOIN - meaningless, but still possible, WE CAN JOIN ANY COLUMNS
 SELECT * FROM customers
 JOIN orders ON customers.id = orders.id;
 
 --*************************************************
--- LEFT JOIN
+-- LEFT JOIN: EVERYTHING FROM A BUT COMMON FROM B
 --*************************************************
 
--- Getting Fancier (Inner Joins Still)
-
+-- GETTING FANCIER (INNER JOINS STILL)
 SELECT first_name, last_name, order_date, amount 
 FROM customers
 JOIN orders
     ON customers.id = orders.customer_id
 ORDER BY order_date;
+
+-- GETTING FANCIER (INNER JOINS STILL)
 SELECT 
     first_name, 
     last_name, 
@@ -113,17 +112,20 @@ JOIN orders
     ON customers.id = orders.customer_id
 GROUP BY orders.customer_id
 ORDER BY total_spent DESC;
-Note: please see here for an animated visual of how left/right joins work.
 
 -- LEFT JOINS
-
+-- EVEN IF SOME CUSTOMER ID ISN'T PRESENT IN ORDER CUSTOMER_ID COLUMN STILL SHOWS UP
 SELECT * FROM customers
 LEFT JOIN orders
     ON customers.id = orders.customer_id;
+
+
 SELECT first_name, last_name, order_date, amount
 FROM customers
 LEFT JOIN orders
     ON customers.id = orders.customer_id; 
+
+-- HANDLY IFNULL
 SELECT 
     first_name, 
     last_name,
@@ -139,27 +141,27 @@ ORDER BY total_spent;
 -- RIGHT JOIN
 --*************************************************
 -- OUR FIRST RIGHT JOIN (seems the same as a left join?)
-
+-- ANY ORDER WHICH IS NOT DONE BY ANY CUSTOMER STILL SHOWS UP IN RESULT (NOT PRACTICAL)
 SELECT * FROM customers
 RIGHT JOIN orders
     ON customers.id = orders.customer_id;
 
--- ALTERING OUR SCHEMA to allow for a better example (optional)
-
+-- ALTERING OUR SCHEMA TO ALLOW FOR A BETTER EXAMPLE (OPTIONAL)
 CREATE TABLE customers(
     id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(100),
     last_name VARCHAR(100),
     email VARCHAR(100)
 );
+-- NOT MENTIONING FOREIGN KEY
 CREATE TABLE orders(
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_date DATE,
     amount DECIMAL(8,2),
     customer_id INT
 );
--- INSERTING NEW DATA (no longer bound by foreign key constraint)
 
+-- INSERTING NEW DATA (NO LONGER BOUND BY FOREIGN KEY CONSTRAINT)
 INSERT INTO customers (first_name, last_name, email) 
 VALUES ('Boy', 'George', 'george@gmail.com'),
        ('George', 'Michael', 'gm@gmail.com'),
@@ -179,7 +181,6 @@ INSERT INTO orders (order_date, amount, customer_id) VALUES
 (CURDATE(), 777.77, 109);
 
 --A MORE COMPLEX RIGHT JOIN
-
 SELECT 
     IFNULL(first_name,'MISSING') AS first, 
     IFNULL(last_name,'USER') as last, 
@@ -190,49 +191,17 @@ FROM customers
 RIGHT JOIN orders
     ON customers.id = orders.customer_id
 GROUP BY first_name, last_name;
--- WORKING WITH ON DELETE CASCADE
 
-CREATE TABLE customers(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    first_name VARCHAR(100),
-    last_name VARCHAR(100),
-    email VARCHAR(100)
-);
- 
-CREATE TABLE orders(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    order_date DATE,
-    amount DECIMAL(8,2),
-    customer_id INT,
-    FOREIGN KEY(customer_id) 
-        REFERENCES customers(id)
-        ON DELETE CASCADE
-);
- 
- 
-INSERT INTO customers (first_name, last_name, email) 
-VALUES ('Boy', 'George', 'george@gmail.com'),
-       ('George', 'Michael', 'gm@gmail.com'),
-       ('David', 'Bowie', 'david@gmail.com'),
-       ('Blue', 'Steele', 'blue@gmail.com'),
-       ('Bette', 'Davis', 'bette@aol.com');
-       
-INSERT INTO orders (order_date, amount, customer_id)
-VALUES ('2016/02/10', 99.99, 1),
-       ('2017/11/11', 35.50, 1),
-       ('2014/12/12', 800.67, 2),
-       ('2015/01/03', 12.50, 2),
-       ('1999/04/11', 450.25, 5);
+--*************************************************
+-- DELETE CASCADE
+--*************************************************
+-- THIS WILL DELETE DEPENDENT ORDER RECORDS WHEN CUSTOMER IS DELETED
 
-
-
--- The Schema
-
+-- THE SCHEMA
 CREATE TABLE students (
     id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(100)
 );
- 
  
 CREATE TABLE papers (
     title VARCHAR(100),
@@ -242,8 +211,8 @@ CREATE TABLE papers (
         REFERENCES students(id)
         ON DELETE CASCADE
 );
--- The Starter Data
 
+-- THE STARTER DATA
 INSERT INTO students (first_name) VALUES 
 ('Caleb'), 
 ('Samantha'), 
